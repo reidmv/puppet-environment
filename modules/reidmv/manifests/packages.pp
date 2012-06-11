@@ -1,4 +1,5 @@
 class reidmv::packages {
+  require reidmv::apt
 
   Package {
     ensure => installed,
