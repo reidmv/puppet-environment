@@ -5,10 +5,11 @@ class reidmv::packages {
     ensure => installed,
   }
 
+  package { 'chromium-browser': ensure => latest; }
+  package { 'facter': ensure => latest; }
   package { 'git': }
+  package { 'puppet': ensure => latest; }
+  package { 'ubuntu-restricted-extras': }
   package { 'vim': }
-  package { 'puppet':
-    ensure => latest,
-  }
 
 }
