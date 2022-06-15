@@ -8,7 +8,7 @@ import (
 
 func init() {
 	moduleCmd.AddCommand(moduleRemoveCmd)
-	moduleRemoveCmd.Flags().StringVarP(&EnvironmentFlag, "environment", "e", "", "Puppet code environment")
+	moduleRemoveCmd.Flags().StringVarP(&environmentFlag, "environment", "e", "", "Puppet code environment")
 	moduleRemoveCmd.MarkFlagRequired("environment")
 }
 

@@ -8,9 +8,9 @@ import (
 
 func init() {
 	rootCmd.AddCommand(updateCmd)
-	updateCmd.Flags().StringVarP(&TypeFlag, "type", "t", "", "Module type")
-	updateCmd.Flags().StringVarP(&SourceFlag, "source", "s", "", "Module source")
-	updateCmd.Flags().StringVarP(&VersionFlag, "version", "v", "", "Module version")
+	updateCmd.Flags().StringVarP(&typeFlag, "type", "t", "", "Module type")
+	updateCmd.Flags().StringVarP(&sourceFlag, "source", "s", "", "Module source")
+	updateCmd.Flags().StringVarP(&versionFlag, "version", "v", "", "Module version")
 	updateCmd.MarkFlagRequired("type")
 	updateCmd.MarkFlagRequired("source")
 }

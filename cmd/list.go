@@ -15,6 +15,8 @@ var listCmd = &cobra.Command{
 	Short: "List all Puppet code environments",
 	Long:  `List each Puppet code environment defined in environments.yaml`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Not Implemented")
+		for name, _ := range environmentsFile.Environments {
+			fmt.Println(name)
+		}
 	},
 }

@@ -8,10 +8,10 @@ import (
 
 func init() {
 	moduleCmd.AddCommand(moduleAddCmd)
-	moduleAddCmd.Flags().StringVarP(&EnvironmentFlag, "environment", "e", "", "Puppet code environment")
-	moduleAddCmd.Flags().StringVarP(&TypeFlag, "type", "t", "", "Module type")
-	moduleAddCmd.Flags().StringVarP(&SourceFlag, "source", "s", "", "Module source")
-	moduleAddCmd.Flags().StringVarP(&VersionFlag, "version", "v", "", "Module version")
+	moduleAddCmd.Flags().StringVarP(&environmentFlag, "environment", "e", "", "Puppet code environment")
+	moduleAddCmd.Flags().StringVarP(&typeFlag, "type", "t", "", "Module type")
+	moduleAddCmd.Flags().StringVarP(&sourceFlag, "source", "s", "", "Module source")
+	moduleAddCmd.Flags().StringVarP(&versionFlag, "version", "v", "", "Module version")
 	moduleAddCmd.MarkFlagRequired("environment")
 	moduleAddCmd.MarkFlagRequired("type")
 	moduleAddCmd.MarkFlagRequired("source")
