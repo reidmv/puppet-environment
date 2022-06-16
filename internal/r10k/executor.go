@@ -31,7 +31,7 @@ func DeployEnvironment(name, config, dir string) (ret error) {
 		return err
 	}
 
-	cmd := exec.Command("echo", "r10k", "--config", r10kYaml.Name(), "deploy", "environment", name, "-m")
+	cmd := exec.Command("r10k", "--config", r10kYaml.Name(), "deploy", "environment", name, "-v", "-m")
 	pipe, err := cmd.StdoutPipe()
 	if err != nil {
 		return err

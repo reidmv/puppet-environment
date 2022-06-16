@@ -3,7 +3,9 @@ package cmd
 import (
 	"log"
 
+	"github.com/reidmv/puppet-environment/internal/r10k"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -34,6 +36,9 @@ var updateCmd = &cobra.Command{
 		}
 
 		environmentsFile.Write()
-
+		err := r10k.DeployEnvironment(name, environmentsFile.Path, viper.GetString("environments-path"))
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
