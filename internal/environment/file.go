@@ -30,5 +30,8 @@ func (f *EnvironmentsFile) Write() error {
 		return err
 	}
 	err = os.WriteFile(f.Path, yamlData, 0644)
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -13,8 +13,6 @@ func init() {
 	moduleUpdateCmd.Flags().StringVarP(&sourceFlag, "source", "s", "", "Module source")
 	moduleUpdateCmd.Flags().StringVarP(&versionFlag, "version", "v", "", "Module version")
 	moduleUpdateCmd.MarkFlagRequired("environment")
-	moduleUpdateCmd.MarkFlagRequired("type")
-	moduleUpdateCmd.MarkFlagRequired("source")
 }
 
 var moduleUpdateCmd = &cobra.Command{
@@ -23,6 +21,24 @@ var moduleUpdateCmd = &cobra.Command{
 	Long:  `Update module for a Puppet code environment defined in environments.yaml`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Not Implemented")
+		name := args[0]
+		env, ok := environmentsFile.Environments[environmentFlag]
+		if !ok {
+			log.Fatal("Environment does not exist!")
+		}
+		if _, ok = env.Modules[name]; !ok {
+			log.Fatal("Module does not exist!")
+		}
+		if cmd.Flags().Changed("type") {
+			env.Modules[name].Type = typeFlag
+		}
+		if cmd.Flags().Changed("source") {
+			env.Modules[name].Source = sourceFlag
+		}
+		if cmd.Flags().Changed("version") {
+			env.Modules[name].Version = versionFlag
+		}
+
+		environmentsFile.Write()
 	},
 }

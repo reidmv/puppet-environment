@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -15,6 +15,13 @@ var removeCmd = &cobra.Command{
 	Short: "Remove an existing Puppet code environment",
 	Long:  `Remove a Puppet code environment defined in environments.yaml`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Not Implemented")
+		name := args[0]
+		if _, ok := environmentsFile.Environments[name]; !ok {
+			log.Fatal("Environment does not exist!")
+		} else {
+			delete(environmentsFile.Environments, name)
+		}
+
+		environmentsFile.Write()
 	},
 }

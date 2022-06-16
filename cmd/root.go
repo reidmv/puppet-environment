@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/reidmv/puppet-environment/internal/environment"
 	"github.com/spf13/cobra"
@@ -16,10 +17,14 @@ func init() {
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.PersistentFlags().StringVar(&configFlag, "config", "", "config file")
-	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-file", "", "environments yaml file")
 
-	viper.BindPFlag("environments-file", rootCmd.PersistentFlags().Lookup("environments-file"))
-	viper.SetDefault("environments-file", "/etc/puppetlabs/puppet/environments.yaml")
+	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-yaml", "", "environments yaml config file")
+	viper.BindPFlag("environments-yaml", rootCmd.PersistentFlags().Lookup("environments-yaml"))
+	viper.SetDefault("environments-yaml", "/etc/puppetlabs/puppet/environments.yaml")
+
+	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-path", "", "directory to deploy environments to")
+	viper.BindPFlag("environments-path", rootCmd.PersistentFlags().Lookup("environments-path"))
+	viper.SetDefault("environments-path", "/etc/puppetlabs/code/environments")
 }
 
 var (
@@ -73,11 +78,15 @@ func initConfig() {
 }
 
 func initEnvironmentsFile() {
+	abs, err := filepath.Abs(viper.GetString("environments-yaml"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	environmentsFile = environment.EnvironmentsFile{
-		Path: viper.GetString("environments-file"),
+		Path: abs,
 	}
 
-	_, err := os.Stat(environmentsFile.Path)
+	_, err = os.Stat(environmentsFile.Path)
 
 	if errors.Is(err, os.ErrNotExist) {
 		environmentsFile.Environments = environment.Environments{}
