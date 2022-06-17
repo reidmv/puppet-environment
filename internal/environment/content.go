@@ -5,16 +5,16 @@ import (
 )
 
 type Environment struct {
-	Type    string
-	Source  string
-	Version string
-	Modules Modules
+	Type    string  `yaml:"type,omitempty"`
+	Source  string  `yaml:"source,omitempty"`
+	Version string  `yaml:"version,omitempty"`
+	Modules Modules `yaml:"modules,omitempty"`
 }
 
 type Module struct {
-	Type    string
-	Source  string
-	Version string
+	Type    string `yaml:"type,omitempty"`
+	Source  string `yaml:"source,omitempty"`
+	Version string `yaml:"version,omitempty"`
 }
 
 type Environments map[string]*Environment
