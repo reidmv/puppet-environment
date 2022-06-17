@@ -4,7 +4,9 @@ import (
 	"log"
 
 	"github.com/reidmv/puppet-environment/internal/environment"
+	"github.com/reidmv/puppet-environment/internal/r10k"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -39,5 +41,9 @@ var moduleAddCmd = &cobra.Command{
 		}
 
 		environmentsFile.Write()
+		err := r10k.DeployModule(environmentFlag, name, environmentsFile.Path, viper.GetString("environments-path"))
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }

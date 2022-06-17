@@ -2,8 +2,11 @@ package cmd
 
 import (
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -29,5 +32,6 @@ var moduleRemoveCmd = &cobra.Command{
 		delete(env.Modules, name)
 
 		environmentsFile.Write()
+		os.RemoveAll(filepath.Join(viper.GetString("environments-path"), environmentFlag, "modules", name))
 	},
 }
