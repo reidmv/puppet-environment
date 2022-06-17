@@ -26,10 +26,10 @@ var moduleUpdateCmd = &cobra.Command{
 		name := args[0]
 		env, ok := environmentsFile.Environments[environmentFlag]
 		if !ok {
-			log.Fatal("Environment does not exist!")
+			log.Fatalf("Environment %s does not exist!", environmentFlag)
 		}
 		if _, ok = env.Modules[name]; !ok {
-			log.Fatal("Module does not exist!")
+			log.Fatalf("Module %s does not exist!", name)
 		}
 		if cmd.Flags().Changed("type") {
 			env.Modules[name].Type = typeFlag

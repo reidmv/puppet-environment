@@ -29,16 +29,20 @@ var moduleAddCmd = &cobra.Command{
 		name := args[0]
 		env, ok := environmentsFile.Environments[environmentFlag]
 		if !ok {
-			log.Fatal("Environment does not exist!")
+			log.Fatalf("Environment %s does not exist!", environmentFlag)
 		}
-		if _, ok = env.Modules[name]; ok {
-			log.Fatal("Module already exists!")
+		if incl, key := env.Modules.Include(name); incl {
+			if name == key {
+				log.Fatalf("Module %s already exists!", name)
+			} else {
+				log.Fatalf("Cannot add %s; name conflicts with %s", name, key)
+			}
 		}
-		env.Modules[name] = &environment.Module{
+		env.Modules.Set(name, &environment.Module{
 			Type:    typeFlag,
 			Source:  sourceFlag,
 			Version: versionFlag,
-		}
+		})
 
 		environmentsFile.Write()
 		err := r10k.DeployModule(environmentFlag, name, environmentsFile.Path, viper.GetString("environments-path"))
