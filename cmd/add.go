@@ -35,7 +35,7 @@ var addCmd = &cobra.Command{
 		}
 
 		environmentsFile.Write()
-		err := r10k.DeployEnvironment(name, environmentsFile.Path, viper.GetString("environments-path"))
+		err := r10k.DeployEnvironment(name, environmentsFile.Path, viper.GetString("environments-root"))
 		if err != nil {
 			log.Fatal(err)
 		}

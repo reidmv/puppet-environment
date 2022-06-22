@@ -43,7 +43,7 @@ var moduleUpdateCmd = &cobra.Command{
 		}
 
 		environmentsFile.Write()
-		err := r10k.DeployModule(environmentFlag, environment.ModuleName(name), environmentsFile.Path, viper.GetString("environments-path"))
+		err := r10k.DeployModule(environmentFlag, environment.ModuleName(name), environmentsFile.Path, viper.GetString("environments-root"))
 		if err != nil {
 			log.Fatal(err)
 		}
