@@ -2,9 +2,13 @@ package r10k
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
+
+	"gopkg.in/yaml.v3"
 )
 
 var confTemplate = `---
@@ -14,6 +18,12 @@ sources:
     config: %s
     basedir: %s
 `
+
+var configPath string
+
+func SetConfigPath(path string) {
+	configPath = path
+}
 
 func DeployEnvironment(name, config, dir string) (ret error) {
 	r10kYaml, err := createTempConfig(config, dir)
@@ -62,7 +72,11 @@ func createTempConfig(config, dir string) (*os.File, error) {
 	if err != nil {
 		return f, err
 	}
-	if _, err = f.Write([]byte(r10kYamlStr(config, dir))); err != nil {
+	configStr, err := r10kYamlStr(config, dir)
+	if err != nil {
+		return f, err
+	}
+	if _, err = f.Write([]byte(configStr)); err != nil {
 		return f, err
 	}
 	return f, nil
@@ -91,6 +105,48 @@ func run(arg0 string, args ...string) error {
 	return nil
 }
 
-func r10kYamlStr(config, dir string) string {
-	return fmt.Sprintf(confTemplate, config, dir)
+func r10kYamlStr(envYaml, envDir string) (string, error) {
+	var config map[string]interface{}
+
+	yamlSource := map[string]string{
+		"type":    "yaml",
+		"config":  envYaml,
+		"basedir": envDir,
+	}
+
+	if _, err := os.Stat(configPath); errors.Is(err, os.ErrNotExist) {
+		config = map[string]interface{}{
+			"sources": map[string]interface{}{
+				"puppet-environment": &yamlSource,
+			},
+		}
+		if bytes, err := yaml.Marshal(config); err != nil {
+			return "", err
+		} else {
+			return string(bytes), nil
+		}
+	}
+
+	bytes, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return "", err
+	}
+	err = yaml.Unmarshal(bytes, &config)
+	if err != nil {
+		return "", err
+	}
+
+	if srcs, ok := config["sources"]; !ok {
+		config["sources"] = map[string]interface{}{
+			"puppet-environment": &yamlSource,
+		}
+	} else {
+		srcs.(map[string]interface{})["puppet-environment"] = &yamlSource
+	}
+
+	if bytes, err = yaml.Marshal(config); err != nil {
+		return "", err
+	} else {
+		return string(bytes), nil
+	}
 }

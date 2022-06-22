@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/reidmv/puppet-environment/internal/environment"
+	"github.com/reidmv/puppet-environment/internal/r10k"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -18,13 +19,17 @@ func init() {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.PersistentFlags().StringVar(&configFlag, "config", "", "config file")
 
-	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-yaml", "", "environments yaml config file")
-	viper.BindPFlag("environments-yaml", rootCmd.PersistentFlags().Lookup("environments-yaml"))
-	viper.SetDefault("environments-yaml", "/etc/puppetlabs/puppet/environments.yaml")
+	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-config", "", "environments yaml config file")
+	viper.BindPFlag("environments-config", rootCmd.PersistentFlags().Lookup("environments-config"))
+	viper.SetDefault("environments-config", "/etc/puppetlabs/puppet/environments.yaml")
 
 	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-path", "", "directory to deploy environments to")
 	viper.BindPFlag("environments-path", rootCmd.PersistentFlags().Lookup("environments-path"))
 	viper.SetDefault("environments-path", "/etc/puppetlabs/code/environments")
+
+	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "r10k-config", "", "path to r10k.yaml file")
+	viper.BindPFlag("r10k-config", rootCmd.PersistentFlags().Lookup("r10k-config"))
+	viper.SetDefault("r10k-config", "/etc/puppetlabs/r10k/r10k.yaml")
 }
 
 var (
@@ -75,10 +80,16 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+
+	if path, err := filepath.Abs(viper.GetString("r10k-config")); err != nil {
+		log.Fatal(err)
+	} else {
+		r10k.SetConfigPath(path)
+	}
 }
 
 func initEnvironmentsFile() {
-	abs, err := filepath.Abs(viper.GetString("environments-yaml"))
+	abs, err := filepath.Abs(viper.GetString("environments-config"))
 	if err != nil {
 		log.Fatal(err)
 	}
