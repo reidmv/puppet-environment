@@ -18,18 +18,9 @@ func init() {
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.PersistentFlags().StringVar(&configFlag, "config", "", "path to .puppet-environment config")
-
 	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-config", "", "path to environments.yaml config")
-	viper.BindPFlag("environments-config", rootCmd.PersistentFlags().Lookup("environments-config"))
-	viper.SetDefault("environments-config", "/etc/puppetlabs/puppet/environments.yaml")
-
 	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "environments-root", "", "directory to deploy environments to")
-	viper.BindPFlag("environments-root", rootCmd.PersistentFlags().Lookup("environments-root"))
-	viper.SetDefault("environments-root", "/etc/puppetlabs/code/environments")
-
 	rootCmd.PersistentFlags().StringVar(&environmentsFileFlag, "r10k-config", "", "path to r10k.yaml config")
-	viper.BindPFlag("r10k-config", rootCmd.PersistentFlags().Lookup("r10k-config"))
-	viper.SetDefault("r10k-config", "/etc/puppetlabs/r10k/r10k.yaml")
 }
 
 var (
@@ -81,6 +72,19 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
+	viper.BindPFlag("environments-config", rootCmd.PersistentFlags().Lookup("environments-config"))
+	viper.SetDefault("environments-config", "/etc/puppetlabs/puppet/environments.yaml")
+
+	viper.BindPFlag("environments-root", rootCmd.PersistentFlags().Lookup("environments-root"))
+	viper.BindPFlag("r10k-config", rootCmd.PersistentFlags().Lookup("r10k-config"))
+	if codeManagerConfigured() {
+		viper.SetDefault("r10k-config", "/etc/puppetlabs/r10k/r10k.yaml")
+		viper.SetDefault("environments-root", "/etc/puppetlabs/code/environments")
+	} else {
+		viper.SetDefault("r10k-config", "/opt/puppetlabs/server/data/code-manager/r10k.yaml")
+		viper.SetDefault("environments-root", "/etc/puppetlabs/code-staging/environments")
+	}
+
 	if path, err := filepath.Abs(viper.GetString("r10k-config")); err != nil {
 		log.Fatal(err)
 	} else {
@@ -108,5 +112,13 @@ func initEnvironmentsFile() {
 		return
 	} else {
 		log.Fatal("Unable to read environments file")
+	}
+}
+
+func codeManagerConfigured() bool {
+	if _, err := os.Stat("/opt/puppetlabs/server/data/code-manager/r10k.yaml"); errors.Is(err, os.ErrNotExist) {
+		return true
+	} else {
+		return false
 	}
 }
