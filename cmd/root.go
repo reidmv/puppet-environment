@@ -84,12 +84,12 @@ func initConfig() {
 	viper.BindPFlag("r10k-config", rootCmd.PersistentFlags().Lookup("r10k-config"))
 	if codeManagerConfigured() {
 		// Default to using config locations assuming Code Manager is in use
-		viper.SetDefault("r10k-config", "/etc/puppetlabs/r10k/r10k.yaml")
-		viper.SetDefault("environments-root", "/etc/puppetlabs/code/environments")
-	} else {
-		// Default to using config locations assuming no Code Manager
 		viper.SetDefault("r10k-config", "/opt/puppetlabs/server/data/code-manager/r10k.yaml")
 		viper.SetDefault("environments-root", "/etc/puppetlabs/code-staging/environments")
+	} else {
+		// Default to using config locations assuming no Code Manager
+		viper.SetDefault("r10k-config", "/etc/puppetlabs/r10k/r10k.yaml")
+		viper.SetDefault("environments-root", "/etc/puppetlabs/code/environments")
 	}
 
 	// Determine the absolute path to r10k.yaml and set it in the r10k package.
