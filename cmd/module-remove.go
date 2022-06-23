@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/reidmv/puppet-environment/internal/environment"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -32,6 +33,6 @@ var moduleRemoveCmd = &cobra.Command{
 		delete(env.Modules, name)
 
 		environmentsFile.Write()
-		os.RemoveAll(filepath.Join(viper.GetString("environments-path"), environmentFlag, "modules", name))
+		os.RemoveAll(filepath.Join(viper.GetString("environments-root"), environmentFlag, "modules", environment.ModuleName(name)))
 	},
 }
