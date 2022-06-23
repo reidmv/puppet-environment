@@ -43,9 +43,12 @@ func (m Modules) keyname(in string) (string, bool) {
 	return "", false
 }
 
-func (m Modules) Set(in string, mod *Module) {
-	if key, incl := m.keyname(in); incl {
-		delete(m, key)
+func (m *Modules) Set(in string, mod *Module) {
+	if *m == nil {
+		*m = make(map[string]*Module)
 	}
-	m[in] = mod
+	if key, incl := m.keyname(in); incl {
+		delete(*m, key)
+	}
+	(*m)[in] = mod
 }

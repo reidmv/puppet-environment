@@ -11,27 +11,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var confTemplate = `---
-sources:
-  puppet-environment:
-    type: yaml
-    config: %s
-    basedir: %s
-`
-
 var configPath string
 
 func SetConfigPath(path string) {
 	configPath = path
 }
 
-func DeployEnvironment(name, config, dir string) (ret error) {
+func DeployEnvironment(name, config, dir string) error {
 	r10kYaml, err := createTempConfig(config, dir)
 	if err != nil {
 		return err
 	}
 	defer func() {
-		ret = closeTempConfig(r10kYaml)
+		r10kYaml.Close()
+		os.Remove(r10kYaml.Name())
 	}()
 
 	err = run("r10k", "--config", r10kYaml.Name(), "deploy", "environment", name, "-v", "-m")
@@ -41,27 +34,18 @@ func DeployEnvironment(name, config, dir string) (ret error) {
 	return nil
 }
 
-func DeployModule(environment, name, config, dir string) (ret error) {
+func DeployModule(environment, name, config, dir string) error {
 	r10kYaml, err := createTempConfig(config, dir)
 	if err != nil {
 		return err
 	}
 	defer func() {
-		ret = closeTempConfig(r10kYaml)
+		r10kYaml.Close()
+		os.Remove(r10kYaml.Name())
 	}()
 
 	err = run("r10k", "--config", r10kYaml.Name(), "deploy", "module", name, "--environment", environment, "-v")
 	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func closeTempConfig(f *os.File) (err error) {
-	if err = f.Close(); err != nil {
-		return err
-	}
-	if err = os.Remove(f.Name()); err != nil {
 		return err
 	}
 	return nil
@@ -101,7 +85,12 @@ func run(arg0 string, args ...string) error {
 		m := scanner.Text()
 		fmt.Println(m)
 	}
-	cmd.Wait()
+
+	err = cmd.Wait()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
