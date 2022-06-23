@@ -51,6 +51,8 @@ func Execute() {
 	}
 }
 
+// initConfig reads in the application config file and sets configuration default values.
+// It should be executed before performing any other work (called by init()).
 func initConfig() {
 	if configFlag != "" {
 		// Use config file from the flag.
@@ -72,19 +74,23 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
+	// Bind config options to corresponding flags
 	viper.BindPFlag("environments-config", rootCmd.PersistentFlags().Lookup("environments-config"))
 	viper.SetDefault("environments-config", "/etc/puppetlabs/puppet/environments.yaml")
 
 	viper.BindPFlag("environments-root", rootCmd.PersistentFlags().Lookup("environments-root"))
 	viper.BindPFlag("r10k-config", rootCmd.PersistentFlags().Lookup("r10k-config"))
 	if codeManagerConfigured() {
+		// Default to using config locations assuming Code Manager is in use
 		viper.SetDefault("r10k-config", "/etc/puppetlabs/r10k/r10k.yaml")
 		viper.SetDefault("environments-root", "/etc/puppetlabs/code/environments")
 	} else {
+		// Default to using config locations assuming no Code Manager
 		viper.SetDefault("r10k-config", "/opt/puppetlabs/server/data/code-manager/r10k.yaml")
 		viper.SetDefault("environments-root", "/etc/puppetlabs/code-staging/environments")
 	}
 
+	// Determine the absolute path to r10k.yaml and set it in the r10k package.
 	if path, err := filepath.Abs(viper.GetString("r10k-config")); err != nil {
 		log.Fatal(err)
 	} else {
@@ -92,6 +98,8 @@ func initConfig() {
 	}
 }
 
+// initEnvironmentFile sets up the object used to read, write, and manipulate environment
+// config data. It should be called before reading or writing to the environments.yaml file.
 func initEnvironmentsFile() {
 	abs, err := filepath.Abs(viper.GetString("environments-config"))
 	if err != nil {
@@ -117,8 +125,10 @@ func initEnvironmentsFile() {
 
 func codeManagerConfigured() bool {
 	if _, err := os.Stat("/opt/puppetlabs/server/data/code-manager/r10k.yaml"); errors.Is(err, os.ErrNotExist) {
-		return true
-	} else {
+		// File does not exist, Code Manager is probably not in use
 		return false
+	} else {
+		// File exists, assume Code Manager is in use
+		return true
 	}
 }
