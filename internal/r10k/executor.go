@@ -79,6 +79,7 @@ func run(arg0 string, args ...string) error {
 	}
 	cmd.Stderr = cmd.Stdout
 
+	fmt.Println(append([]string{"Running command:", arg0}, args...))
 	err = cmd.Start()
 	if err != nil {
 		return err
