@@ -15,6 +15,11 @@ import (
 // Path to look at for a pre-existing r10k.yaml file
 var configPath string
 
+// Ensure PE's bin dir is included in PATH
+func init() {
+	os.Setenv("PATH", strings.Join([]string{os.Getenv("PATH"), "/opt/puppetlabs/bin"}, ":"))
+}
+
 // Sets what path the package will look for r10k.yaml at
 func SetConfigPath(path string) {
 	configPath = path
