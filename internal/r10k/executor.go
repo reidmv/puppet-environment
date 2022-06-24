@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -79,7 +80,7 @@ func run(arg0 string, args ...string) error {
 	}
 	cmd.Stderr = cmd.Stdout
 
-	fmt.Println(append([]string{"Running command:", arg0}, args...))
+	fmt.Println("Running command:", arg0, strings.Join(args, " "))
 	err = cmd.Start()
 	if err != nil {
 		return err
