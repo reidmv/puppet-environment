@@ -17,4 +17,6 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("puppet-environment v0.1 -- HEAD")
 	},
+	PersistentPreRun:  none,
+	PersistentPostRun: none,
 }

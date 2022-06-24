@@ -44,7 +44,15 @@ var rootCmd = &cobra.Command{
 		fmt.Println("Using environments-config:", viper.GetString("environments-config"))
 		fmt.Println("Using environments-root:", viper.GetString("environments-root"))
 	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		if codeManagerConfigured() {
+			fmt.Println("TODO: call file-sync commit and puppet-server cache refresh")
+		}
+	},
 }
+
+// Used to disable PersistentPreRun and PersistentPostRun in other commands
+func none(cmd *cobra.Command, args []string) {}
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {

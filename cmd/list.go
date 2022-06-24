@@ -19,4 +19,6 @@ var listCmd = &cobra.Command{
 			fmt.Println(name)
 		}
 	},
+	PersistentPreRun:  none,
+	PersistentPostRun: none,
 }
