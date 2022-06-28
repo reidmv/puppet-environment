@@ -1,9 +1,8 @@
-package r10k
+package filesync
 
 import (
 	"bytes"
 	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -14,24 +13,13 @@ var (
 	httpClient *http.Client
 )
 
-func InitializeHttpClient(certFile, keyFile, caFile string) error {
-	caPEM, err := ioutil.ReadFile(caFile)
-	if err != nil {
-		return err
-	}
-
-	caCertPool := x509.NewCertPool()
-	if !caCertPool.AppendCertsFromPEM(caPEM) {
-		return errors.New("unable to parse CA PEM content")
-	}
-
+func InitializeHttpClient(certFile, keyFile string) error {
 	tlsCert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
 		return err
 	}
 
 	tlsConfig := tls.Config{
-		RootCAs:            caCertPool,
 		Certificates:       []tls.Certificate{tlsCert},
 		InsecureSkipVerify: true,
 	}

@@ -1,13 +1,16 @@
 package cmd
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/reidmv/puppet-environment/internal/environment"
+	"github.com/reidmv/puppet-environment/internal/filesync"
 	"github.com/reidmv/puppet-environment/internal/r10k"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -46,7 +49,9 @@ var rootCmd = &cobra.Command{
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if codeManagerConfigured() {
-			fmt.Println("TODO: call file-sync commit and puppet-server cache refresh")
+			initFilesync()
+			filesync.FileSyncCommit()
+			fmt.Println("TODO: call file-sync force-sync and puppet-server cache refresh")
 		}
 	},
 }
@@ -119,9 +124,7 @@ func initEnvironmentsFile() {
 		Path: abs,
 	}
 
-	_, err = os.Stat(environmentsFile.Path)
-
-	if errors.Is(err, os.ErrNotExist) {
+	if _, err = os.Stat(environmentsFile.Path); errors.Is(err, os.ErrNotExist) {
 		environmentsFile.Environments = environment.Environments{}
 		return
 	}
@@ -131,6 +134,24 @@ func initEnvironmentsFile() {
 	} else {
 		log.Fatal("Unable to read environments file")
 	}
+}
+
+func initFilesync() {
+	// Get the certname used by Puppet
+	cmd := exec.Command("/opt/puppetlabs/bin/puppet", "config", "print", "certname")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		log.Fatalf("Error running `puppet config print certname`: %v", err)
+	}
+	certname := out.String()
+	certname = certname[:len(certname)-1] // removing EOL
+
+	cert := "/etc/puppetlabs/puppet/ssl/certs/" + certname + ".pem"
+	privkey := "/etc/puppetlabs/puppet/ssl/private_keys/" + certname + ".pem"
+
+	filesync.InitializeHttpClient(cert, privkey)
 }
 
 func codeManagerConfigured() bool {
