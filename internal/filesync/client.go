@@ -31,19 +31,13 @@ func InitializeHttpClient(certFile, keyFile string) error {
 	return nil
 }
 
-func FileSyncCommit() error {
+func Commit() error {
 	if httpClient == nil {
 		return errors.New("HTTP client not initialized")
 	}
 
 	// Perform `file-sync commit`
-	req, err := http.NewRequest("POST", "https://localhost:8140/file-sync/v1/commit", bytes.NewBuffer([]byte(`{"commit-all": true}`)))
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("content-type", "application/json")
-	resp, err := httpClient.Do(req)
+	resp, err := httpClient.Post("https://localhost:8140/file-sync/v1/commit", "application/json", bytes.NewBuffer([]byte(`{"commit-all": true}`)))
 	if err != nil {
 		return err
 	}
@@ -65,13 +59,5 @@ func FileSyncCommit() error {
 	}
 
 	// Seems like it all worked
-	return nil
-}
-
-func FileSyncForceSync() error {
-	if httpClient == nil {
-		return errors.New("HTTP client not initialized")
-	}
-
 	return nil
 }

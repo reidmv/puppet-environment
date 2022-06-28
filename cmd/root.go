@@ -50,7 +50,7 @@ var rootCmd = &cobra.Command{
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if codeManagerConfigured() {
 			initFilesync()
-			filesync.FileSyncCommit()
+			filesync.Commit()
 			fmt.Println("TODO: call file-sync force-sync and puppet-server cache refresh")
 		}
 	},
