@@ -19,13 +19,13 @@ func InitializeHttpClient(certFile, keyFile string) error {
 		return err
 	}
 
-	tlsConfig := tls.Config{
+	tlsConfig := &tls.Config{
 		Certificates:       []tls.Certificate{tlsCert},
 		InsecureSkipVerify: true,
 	}
 
-	transport := http.Transport{TLSClientConfig: &tlsConfig}
-	httpClient = &http.Client{Transport: &transport}
+	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	httpClient = &http.Client{Transport: transport}
 
 	// If we got this far, no errors occurred
 	return nil
@@ -36,24 +36,35 @@ func FileSyncCommit() error {
 		return errors.New("HTTP client not initialized")
 	}
 
-	req, err := http.NewRequest("GET", "https://localhost:8140/file-sync/v1/commit", bytes.NewBuffer([]byte(`{"commit-all": true}`)))
+	// Perform `file-sync commit`
+	req, err := http.NewRequest("POST", "https://localhost:8140/file-sync/v1/commit", bytes.NewBuffer([]byte(`{"commit-all": true}`)))
 	if err != nil {
 		return err
 	}
 
+	req.Header.Set("content-type", "application/json")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return err
 	}
-
 	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("file-sync commit returned error: %v", body)
+	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	// Perform `file-sync force-sync`
+	resp, err = httpClient.Post("https://localhost:8140/file-sync/v1/force-sync", "application/json", nil)
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("file-sync commit returned error: %v", body)
+	}
 
-	fmt.Println(body)
+	// Seems like it all worked
 	return nil
 }
 
