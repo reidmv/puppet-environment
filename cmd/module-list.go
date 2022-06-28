@@ -26,6 +26,5 @@ var moduleListCmd = &cobra.Command{
 			fmt.Println(modname)
 		}
 	},
-	PersistentPreRun:  none,
 	PersistentPostRun: none,
 }
