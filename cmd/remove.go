@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -27,6 +28,7 @@ var removeCmd = &cobra.Command{
 		}
 
 		environmentsFile.Write()
-		os.RemoveAll(filepath.Join(viper.GetString("environments-path"), name))
+		fmt.Println("Removing " + filepath.Join(viper.GetString("environments-root"), name))
+		os.RemoveAll(filepath.Join(viper.GetString("environments-root"), name))
 	},
 }
