@@ -25,6 +25,15 @@ var moduleAddCmd = &cobra.Command{
 	Short: "Add module to a Puppet code environment",
 	Long:  `Add module to a Puppet code environment defined in environments.yaml`,
 	Args:  cobra.ExactArgs(1),
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if !cmd.Flags().Changed("type") && !cmd.Flags().Changed("source") && !cmd.Flags().Changed("version") {
+			cmd.Flags().Set("type", "forge")
+			cmd.Flags().Set("source", "https://forge.puppet.com")
+		}
+		if typeFlag == "forge" && !cmd.Flags().Changed("source") {
+			cmd.Flags().Set("source", "https://forge.puppet.com")
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		name := args[0]
 		env, ok := environmentsFile.Environments[environmentFlag]

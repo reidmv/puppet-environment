@@ -23,7 +23,10 @@ var addCmd = &cobra.Command{
 	Short: "Add a new Puppet code environment",
 	Long:  `Add a new Puppet code environment definition to environments.yaml, and deploy it`,
 	PreRun: func(cmd *cobra.Command, args []string) {
-		if typeFlag == "plain" && !cmd.Flags().Changed("source") {
+		if !cmd.Flags().Changed("type") && !cmd.Flags().Changed("source") && !cmd.Flags().Changed("version") {
+			cmd.Flags().Set("type", "plain")
+			cmd.Flags().Set("source", "none")
+		} else if typeFlag == "plain" && !cmd.Flags().Changed("source") {
 			cmd.Flags().Set("source", "none")
 		}
 	},
