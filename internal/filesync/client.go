@@ -58,6 +58,21 @@ func Commit() error {
 		return fmt.Errorf("file-sync commit returned error: %v", body)
 	}
 
+	// Perform `puppetserver delete environment-cache`
+	req, err := http.NewRequest("DELETE", "https://localhost:8140/puppet-admin-api/v1/environment-cache", nil)
+	if err != nil {
+		return err
+	}
+	resp, err = httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		body, _ := ioutil.ReadAll(resp.Body)
+		return fmt.Errorf("puppetserver delete environment-cache returned error: %v", body)
+	}
+
 	// Seems like it all worked
 	return nil
 }

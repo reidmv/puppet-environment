@@ -51,7 +51,6 @@ var rootCmd = &cobra.Command{
 		if codeManagerConfigured() {
 			initFilesync()
 			filesync.Commit()
-			fmt.Println("TODO: call file-sync force-sync and puppet-server cache refresh")
 		}
 	},
 }
