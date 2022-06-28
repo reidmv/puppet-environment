@@ -50,7 +50,10 @@ var rootCmd = &cobra.Command{
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if codeManagerConfigured() {
 			initFilesync()
-			filesync.Commit()
+			fmt.Println("Triggering file-sync commit...")
+			if err := filesync.Commit(); err != nil {
+				log.Fatal(err)
+			}
 		}
 	},
 }
