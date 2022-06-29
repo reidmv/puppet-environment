@@ -44,8 +44,6 @@ var rootCmd = &cobra.Command{
 		The r10k utility is used to instantiate environments defined there.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		initEnvironmentsFile()
-		fmt.Println("Using environments-config:", viper.GetString("environments-config"))
-		fmt.Println("Using environments-root:", viper.GetString("environments-root"))
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if codeManagerConfigured() {
